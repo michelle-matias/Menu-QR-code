@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exemplos de Menus</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: #e6d1c3;
+  color: #333;
+}
+
+/* NAVBAR */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 60px;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: bold;
+  border-bottom: 3px solid #ff7a59;
+}
+
+.menu {
+  display: flex;
+  gap: 40px;
+}
+
+.menu a {
+  text-decoration: none;
+  color: #444;
+  font-size: 14px;
+}
+
+/* TITLE */
+.header {
+  padding: 40px 60px 10px;
+}
+
+.header h1 {
+  font-size: 32px;
+}
+
+/* GRID */
+.grid {
+  padding: 20px 60px 60px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 25px;
+}
+
+/* CARD */
+.card {
+  background: white;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+}
+
+/* IMAGE */
+.card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+/* CONTENT */
+.card-content {
+  padding: 15px;
+}
+
+.card-content h3 {
+  margin-bottom: 8px;
+}
+
+.card-content p {
+  font-size: 13px;
+  color: #666;
+}
+
+/* BUTTON */
+.btn {
+  margin-top: 10px;
+  display: inline-block;
+  padding: 8px 12px;
+  background: #ff8a65;
+  color: white;
+  border-radius: 8px;
+  font-size: 12px;
+}
+</style>
+</head>
+
+<body>
+
+<header class="navbar">
+  <div class="logo">OddMenu</div>
+
+  <nav class="menu">
+    <a href="main.html">Home</a>
+    <a href="#">Blogue</a>
+  </nav>
+
+  <div>👤 login</div>
+</header>
+
+<section class="header">
+  <h1>Exemplos de Menus</h1>
+</section>
+
+<section class="grid">
+
+  <!-- CARD 1 -->
+  <div class="card">
+    <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c">
+    <div class="card-content">
+      <h3>Restaurante Moderno</h3>
+      <p>Menu elegante com pratos principais e sobremesas</p>
+      <span class="btn">Ver menu</span>
+    </div>
+  </div>
+
+  <!-- CARD 2 -->
+  <div class="card">
+    <img src="https://images.unsplash.com/photo-1551024601-bec78aea704b">
+    <div class="card-content">
+      <h3>Menu de Sobremesas</h3>
+      <p>Doces, bolos e gelados</p>
+      <span class="btn">Ver menu</span>
+    </div>
+  </div>
+
+  <!-- CARD 3 -->
+  <div class="card">
+    <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836">
+    <div class="card-content">
+      <h3>Menu de Pequeno-almoço</h3>
+      <p>Café, panquecas e snacks</p>
+      <span class="btn">Ver menu</span>
+    </div>
+  </div>
+
+  <!-- CARD 4 -->
+  <div class="card">
+    <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd">
+    <div class="card-content">
+      <h3>Menu Saudável</h3>
+      <p>Saladas e opções leves</p>
+      <span class="btn">Ver menu</span>
+    </div>
+  </div>
+
+</section>
+
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - Menu4U</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: #e6d1c3;
+  color: #333;
+}
+
+/* NAVBAR */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 60px;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: bold;
+  border-bottom: 3px solid #ff7a59;
+}
+
+.menu {
+  display: flex;
+  gap: 40px;
+}
+
+.menu a {
+  text-decoration: none;
+  color: #444;
+  font-size: 14px;
+}
+
+/* LOGIN CONTAINER */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+}
+
+/* CARD */
+.login-card {
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  width: 320px;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+}
+
+.login-card h2 {
+  margin-bottom: 20px;
+}
+
+/* INPUTS */
+.input-group {
+  margin-bottom: 15px;
+}
+
+.input-group label {
+  font-size: 13px;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+/* BUTTON */
+.btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #ff8a65;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+/* EXTRA */
+.extra {
+  margin-top: 15px;
+  font-size: 12px;
+  text-align: center;
+}
+
+.extra a {
+  color: #ff8a65;
+  text-decoration: none;
+}
+</style>
+</head>
+
+<body>
+
+<header class="navbar">
+  <div class="logo">Menu4U</div>
+
+  <nav class="menu">
+    <a href="main.html">Home</a>
+    <a href="Exemplos menu.html">Exemplos</a>
+  </nav>
+
+  <div>👤</div>
+</header>
+
+<div class="container">
+
+  <div class="login-card">
+    <h2>Entrar</h2>
+
+    <div class="input-group">
+      <label>Email</label>
+      <input type="email" placeholder="teu@email.com">
+    </div>
+
+    <div class="input-group">
+      <label>Password</label>
+      <input type="password" placeholder="••••••••">
+    </div>
+
+    <button class="btn">Login</button>
+
+    <div class="extra">
+      <p>Não tens conta? <a href="#">Criar conta</a></p>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
