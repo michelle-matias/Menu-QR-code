@@ -1,3 +1,7 @@
+// Testar a ligação
+console.log("Supabase ligado com sucesso!", supabase);
+
+
 // Aguarda que o documento esteja totalmente carregado
 document.addEventListener('DOMContentLoaded', () => {
 

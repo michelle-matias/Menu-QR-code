@@ -7,12 +7,10 @@
     <title>Menu4U - Criar Conta</title>
     <link rel="stylesheet" href="create.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body class="login-page">
-    <!-- Script específico para registo, se necessário -->
-    <script src="register.js"></script>
-
     <!-- Navegação Superior (Idêntica ao Login) -->
     <header class="navbar">
         <div class="logo">
@@ -42,27 +40,28 @@
                 </div>
                 <div class="input-group">
                     <label>Email</label>
-                    <input type="email" placeholder="exemplo@email.pt" required>
+                    <input id="create-email" type="email" placeholder="exemplo@email.pt" required>
                 </div>
                 <div class="input-group">
                     <label>Password</label>
-                    <input type="password" placeholder="••••••••" required>
+                    <input id="create-password" type="password" placeholder="••••••••" required>
                 </div>
                 <div class="input-group">
                     <label>Confirm Password</label>
-                    <input type="password" placeholder="••••••••" required>
+                    <input id="confirm-password" type="password" placeholder="••••••••" required>
                 </div>
-                <button type="submit" class="btn-signin-active">Create account</button>
+                <button href="../login/login.html" type="submit" class="btn-signin-active">Create account</button>
             </form>
 
             <!-- Rodapé do Card invertendo a lógica para Login -->
             <div class="card-footer">
-                Already have an account? <a href="login.html">Sign in</a>
+                Already have an account? <a href="../login/login.html">Sign in</a>
             </div>
         </div>
     </main>
 
-    <script src="script.js"></script>
+    <!-- Script específico para registo, se necessário -->
+    <script src="create.js" type="module"></script>
 </body>
 
 </html>

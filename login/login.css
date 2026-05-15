@@ -1,100 +1,202 @@
-/* Reset e Base */
+/*  VARIÁVEIS E CONFIGURAÇÕES GERAIS */
+:root {
+    --primary-color: #5d7a5d;
+    /* O verde do ícone */
+    --primary-hover: #4a634a;
+    /* Verde mais escuro para hover */
+    --bg-dark: #1e251e;
+    /* Fundo escuro da página/navbar */
+    --card-bg: #ffffff;
+    /* Fundo do formulário */
+    --text-main: #333333;
+    /* Cor do texto principal */
+    --text-muted: #666666;
+    /* Cor de textos secundários */
+    --border-color: #cccccc;
+    /* Cor das bordas dos inputs */
+    --border-focus: #5d7a5d;
+    /* Borda ativa do input */
+    --border-radius: 8px;
+    /* Arredondamento padrão */
+    --transition: all 0.3s ease;
+    /* Transição suave de efeitos */
+}
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-body {
-    background-color: #fdfbe8;
-    color: #333;
-}
-
-/* Navbar */
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 50px;
-    background-color: #5d7a5d;
-    color: white;
-}
-
-.logo {
-    font-size: 1.5rem;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.auth-buttons {
-    display: flex;
-    gap: 15px;
-}
-
-.btn-main-page {
-    text-decoration: none;
-    padding: 10px 25px;
-    border-radius: 25px;
-    font-weight: 600;
-    transition: 0.3s;
-    background-color: white;
-    color: #5d7a5d;
-}
-
-.btn-main-page:hover {
-    background-color: white;
-    color: #5d7a5d;
-}
-
-.login-page {
-    background-color: #fdfbe8;
+body.login-page {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
 
+/* (NAVBAR)*/
+.navbar {
+    background-color: #ffffff;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.navbar .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.navbar .logo a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.navbar .logo i {
+    margin-right: 0.5rem;
+    color: var(--primary-color);
+}
+
+.btn-main-page {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--primary-color);
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+}
+
+.btn-main-page:hover {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+}
+
+/*  CARD CENTRAL DE LOGIN / REGISTO*/
 .login-container {
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: 2rem;
+    margin-top: 60px;
+    /* Evita que o card fique colado à navbar */
 }
 
-.btn-signin-active {
+.login-card {
+    background-color: var(--card-bg);
     width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 8px;
-    background-color: #5d7a5d;
-    color: white;
-    font-weight: bold;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background 0.3s;
-    margin-top: 10px;
+    max-width: 420px;
+    padding: 2.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
 
-.btn-signin-active:hover {
-    background-color: #4a634a;
+.card-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.card-header h2 {
+    font-size: 1.8rem;
+    margin: 0.5rem 0 0.25rem 0;
+    color: var(--text-main);
+}
+
+.card-header p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+/* FORMULÁRIO E INPUTS*/
+#loginForm,
+#registerForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.input-group label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-main);
 }
 
 .input-group input {
     width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 8px;
-    background-color: #2d2d2d;
-    color: white;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
     font-size: 1rem;
+    outline: none;
+    transition: var(--transition);
 }
 
-.input-group label {
-    display: block;
-    margin-bottom: 8px;
+.input-group input:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(93, 122, 93, 0.2);
+}
+
+/*BOTÕES E RODAPÉ DO CARD*/
+.btn-signin-active {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    border: none;
+    padding: 0.75rem;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: var(--transition);
+    margin-top: 0.5rem;
+}
+
+.btn-signin-active:hover {
+    background-color: var(--primary-hover);
+}
+
+.card-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.card-footer a {
+    color: var(--primary-color);
+    text-decoration: none;
     font-weight: 600;
-    color: #444;
+    transition: var(--transition);
+}
+
+.card-footer a:hover {
+    text-decoration: underline;
+    color: var(--primary-hover);
+}
+
+/* RESPONSIVIDADE (MOBILE)*/
+@media (max-width: 480px) {
+    .navbar {
+        padding: 1rem;
+    }
+
+    .login-card {
+        padding: 1.5rem;
+    }
 }

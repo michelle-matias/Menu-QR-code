@@ -4,37 +4,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Menu4U - Bem-vindo</title>
+  <title>Menu4U - Login</title>
   <link rel="stylesheet" href="login.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body class="login-page">
-  <script src="login.js"></script>
 
-  <!-- Navegação Superior -->
+  <!-- Navbar igual à da create.jpg -->
   <header class="navbar">
     <div class="logo">
-      <!-- O logo agora é um link que redireciona para a home -->
-      <a href="../main/main.html" style="color: white; text-decoration: none;">
+      <a href="../main/main.html">
         <i class="fas fa-qrcode"></i> Menu4U
       </a>
     </div>
-    <div class="auth-buttons">
-      <!-- Botão alterado para Home Page -->
-      <a href="../main/main.html" class="btn-main-page">Home Page</a>
-    </div>
+    <a href="../main/main.html" class="btn-main-page">Home Page</a>
   </header>
 
-  <!-- Content centralizado -->
   <main class="login-container">
     <div class="login-card">
       <div class="card-header">
-        <i class="fas fa-qrcode" style="font-size: 2rem; color: #5d7a5d;"></i>
-        <h2>Menu4U</h2>
-        <p>Sign in to manage your restaurant
-        </p>
-
+        <i class="fas fa-qrcode icon-green"></i>
+        <h1>Menu4U</h1>
+        <p>Sign in to manage your restaurant</p>
       </div>
 
       <form id="loginForm">
@@ -46,17 +38,19 @@
           <label>Password</label>
           <input type="password" placeholder="••••••••" required>
         </div>
+
         <button type="submit" class="btn-signin-active">Sign in</button>
       </form>
 
       <div class="card-footer">
-        <a href="#">Forgot password?</a> · <a href="../Create account/Create.html">Create account</a>
+        <a href="#">Forgot password?</a> · <a href="register.html">Create account</a>
       </div>
     </div>
   </main>
 
-  <script src="script.js"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../config.js"></script>
+  <script src="login.js" type="module"></script> <!-- O teu script principal -->
 </body>
 
 </html>
