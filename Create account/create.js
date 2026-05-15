@@ -1,7 +1,7 @@
 // Inicializa o supabase (usa as tuas chaves)
 import { SUPABASE_URL, SUPABASE_KEY } from '../.env.js';
 
-
+const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 const registerForm = document.getElementById('registerForm');
 
 registerForm.addEventListener('submit', async (e) => {
