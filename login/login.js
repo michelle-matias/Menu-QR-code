@@ -1,3 +1,7 @@
+import { SUPABASE_URL, SUPABASE_KEY } from '../.env.js';
+
+// Initialize the client exactly like you do in register
+const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
 const loginForm = document.getElementById('loginForm');
 const navbar = document.querySelector('.navbar');
@@ -18,6 +22,11 @@ if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
+        if (!supabaseClient) {
+            alert('Supabase não está disponível.');
+            return;
+        }
+
         const emailInput = loginForm.querySelector('input[type="email"]');
         const passwordInput = loginForm.querySelector('input[type="password"]');
         const email = emailInput ? emailInput.value.trim() : '';
@@ -28,39 +37,19 @@ if (loginForm) {
             return;
         }
 
-        console.log('Tentativa de login:', { email, password });
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+            email,
+            password,
+        });
 
-        if (window.supabase && typeof supabase.auth.signInWithPassword === 'function') {
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email,
-                password,
-            });
-
-            if (error) {
-                alert('Login falhou: ' + error.message);
-                return;
-            }
-
-            console.log('Utilizador logado:', data.user);
-        } else {
-            alert('Funcionalidade de login simulada para: ' + email);
+        if (error) {
+            alert('Login falhou: ' + error.message);
+            return;
         }
 
-        window.location.href = 'editor.html';
+        // At this point login succeeded — data.user is available directly
+        const user = data.user;
+        alert('Login com sucesso! Bem-vindo, ' + user.email);
+        window.location.href = '../estatistics/estatistics.html';
     });
-} else {
-    console.warn('loginForm não encontrado em login.js');
 }
-
-async function checkUser() {
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-        // Se não houver utilizador, manda de volta para o login
-        window.location.href = "login.html";
-    } else {
-        console.log("Bem-vindo ao Menu4U,", user.email);
-    }
-}
-
-checkUser();
