@@ -171,13 +171,11 @@ dishForm.addEventListener('submit', async (e) => {
         error = response.error;
 
     } else {
-
-        const response = await supabaseClient
-            .from('menu_items')
-            .insert([dish]);
-
-        error = response.error;
+        ({ error } = await db.from('dishes').insert(payload));
     }
+
+    saveBtn.disabled = false;
+    saveBtn.textContent = editingId ? 'Update Dish' : 'Save Dish';
 
     if (error) {
         console.log(error);
