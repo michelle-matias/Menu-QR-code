@@ -5,8 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Menu4U - Estatísticas</title>
+    <link rel="stylesheet" href="../shared.css">
     <link rel="stylesheet" href="./estatistics.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body class="dashboard-body">
@@ -17,7 +19,7 @@
             <i class="fas fa-qrcode"></i> Menu4U
         </div>
         <div class="nav-right">
-            <a href="index.html" class="btn-home-nav">Main Page</a>
+            <a href="../estatistics/estatistics.html" class="btn-home-nav">Main Page</a>
         </div>
     </header>
 
@@ -25,25 +27,17 @@
         <!-- Barra Lateral -->
         <aside class="sidebar">
             <div class="section-title">MANAGEMENT</div>
-            <ul>
-                <li class="active"><i class="fas fa-chart-line"></i> Estatísticas</li>
-                <a href="../menu_editor/menu.html" style="text-decoration: none;">
-                    <li><i class="fas fa-bars"></i> Menu editor</li>
-                </a>
-                <li><i class="fas fa-qrcode"></i> QR code</li>
-                <li><i class="fas fa-clipboard-list"></i> Orders</li>
-            </ul>
-
-            <div class="section-title">ACCOUNT</div>
-            <ul>
-                <li><i class="far fa-user"></i> Profile</li>
-                <li><i class="fas fa-cog"></i> Settings</li>
+             <ul>
+                <li class="active"><a href="../estatistics/estatistics.html"><i class="fas fa-chart-line"></i> Estatístics</a></li>
+                <li><a href="../menu_editor/menu.html"><i class="fas fa-bars"></i> Menu editor</a></li>
+                <li><a href="../QR-Code/QR.html"><i class="fas fa-qrcode"></i> QR code</a></li>
+                <li><a href="#"><i class="fas fa-clipboard-list"></i> Orders</a></li>
             </ul>
         </aside>
 
         <!-- Conteúdo das Estatísticas -->
         <main class="content-area">
-            <h1>Estatísticas</h1>
+            <h1>Estatístics</h1>
 
             <!-- Cards de Resumo -->
             <div class="stats-grid">
@@ -107,6 +101,8 @@
         </main>
     </div>
 
+    <script type="module" src="../header.js"></script>
+    <script type="module" src="./estatistics.js"></script>
 </body>
 
 </html>

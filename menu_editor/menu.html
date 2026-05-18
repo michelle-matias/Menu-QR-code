@@ -1,60 +1,87 @@
 <!DOCTYPE html>
-<html lang="pt">
-
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menu4U - Editor de Menu</title>
-    <!-- CSS Externo -->
-    <link rel="stylesheet" href="../menu_editor/menu.css">
-    <!-- Ícones FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Menu Editor</title>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    
+    <link rel="stylesheet" href="../shared.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="menu.css">
+</head>
 <body class="dashboard-body">
 
-    <!-- Barra Superior -->
-    <header class="top-bar">
+     <header class="top-bar">
         <div class="logo">
-            <i class="fas fa-qrcode"></i> MENU4U
+            <i class="fas fa-qrcode"></i> Menu4U
         </div>
         <div class="nav-right">
-            <a href="index.html" class="btn-home-nav">Main Page</a>
+            <a href="../estatistics/estatistics.html" class="btn-home-nav">Main Page</a>
         </div>
     </header>
 
     <div class="main-layout">
-        <!-- Barra Lateral (Sidebar) -->
+        <!-- Barra Lateral -->
         <aside class="sidebar">
             <div class="section-title">MANAGEMENT</div>
             <ul>
-                <a href="../estatistics/estatistics.html">
-                    <li><i class="fas fa-chart-line"></i> Estatísticas</li>
-                </a>
-                <a href="editor.html">
-                    <li class="active"><i class="fas fa-utensils"></i> Menu editor</li>
-                </a>
-                <li><i class="fas fa-qrcode"></i> QR code</li>
-                <li><i class="fas fa-clipboard-list"></i> Orders</li>
+                <li><a href="../estatistics/estatistics.html"><i class="fas fa-chart-line"></i> Estatístics</a></li>
+                <li class="active"><a href="../menu_editor/menu.html"><i class="fas fa-bars"></i> Menu editor</a></li>
+                <li><a href="../QR-Code/QR.html"><i class="fas fa-qrcode"></i> QR code</a></li>
+                <li><a href="#"><i class="fas fa-clipboard-list"></i> Orders</a></li>
             </ul>
 
             <div class="section-title">ACCOUNT</div>
             <ul>
-                <li><i class="far fa-user"></i> Profile</li>
-                <li><i class="fas fa-cog"></i> Settings</li>
+                <li><a href="#"><i class="far fa-user"></i> Profile</a></li>
+                <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
             </ul>
         </aside>
 
-        <!-- Área Principal do Editor -->
+
         <main class="content-area">
-            <div class="header-inline">
-                <h1>Menu editor</h1>
-                <button class="btn-add-dish" onclick="toggleModal()">+ Add dish</button>
+
+    <div class="header-inline">
+        <h1>Menu Editor</h1>
+
+        <div class="buttons">
+            <button class="btn-secondary" onclick="previewMenu()">Preview Menu</button>
+            <button class="btn-primary" onclick="openModal()">+ Add Dish</button>
+        </div>
+    </div>
+
+    <canvas id="qr"></canvas>
+
+    <div id="menuContainer"></div>
+
+</main>
+
+<div class="modal" id="dishModal">
+    <div class="modal-content">
+        <h2 id="modalTitle">Add Dish</h2>
+
+        <form id="dishForm">
+
+            <div class="input-group">
+                <label>Dish Name</label>
+                <input type="text" id="dishName" required>
             </div>
 
-            <!-- Filtros de Categoria -->
             <div class="input-group">
-                <label>Categoria</label>
+                <label>Description</label>
+                <textarea id="dishDescription" required></textarea>
+            </div>
+
+            <div class="input-group">
+                <label>Price (€)</label>
+                <input type="number" id="dishPrice" step="0.01" required>
+            </div>
+
+            <div class="input-group">
+                <label>Category</label>
                 <select id="dishCategory" required>
                     <option value="Starters">Starters</option>
                     <option value="Mains">Mains</option>
@@ -63,57 +90,27 @@
                 </select>
             </div>
 
-            <!-- Grelha onde os pratos aparecem -->
-            <div class="menu-grid" id="menuGrid">
-                <!-- Pratos iniciais de exemplo (como em editor de menu.jpg) -->
-                <div class="dish-card">
-                    <div class="dish-img-container">🍱</div>
-                    <div class="dish-info">
-                        <h3>Francesinha</h3>
-                        <p>Sandwich, cured meats, spicy sauce</p>
-                        <span class="dish-price">€12.50</span>
-                    </div>
-                    <div class="card-actions">
-                        <button class="btn-icon"><i class="far fa-edit"></i></button>
-                        <button class="btn-icon" onclick="this.closest('.dish-card').remove()"><i
-                                class="far fa-trash-alt"></i></button>
-                    </div>
-                </div>
+            <div class="input-group">
+                <label>Image URL</label>
+                <input type="text" id="dishImage" placeholder="https://...">
             </div>
-        </main>
-    </div>
 
-    <!-- Modal para Adicionar Novo Prato -->
-    <div id="dishModal" class="modal">
-        <div class="modal-content">
-            <h2>Novo Prato</h2>
-            <form id="menuForm">
-                <div class="input-group">
-                    <label>Nome do Prato</label>
-                    <input type="text" id="dishName" placeholder="Ex: Bacalhau à Brás" required>
-                </div>
-                <div class="input-group">
-                    <label>Descrição/Ingredientes</label>
-                    <input type="text" id="dishDesc" placeholder="Ex: Batata, ovo, bacalhau..." required>
-                </div>
-                <div class="input-group">
-                    <label>Preço (€)</label>
-                    <input type="number" id="dishPrice" step="0.01" placeholder="15.00" required>
-                </div>
-                <div class="input-group">
-                    <label>Foto do Prato</label>
-                    <input type="file" id="dishImage" accept="image/*" required>
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" class="btn-cancel" onclick="toggleModal()">Cancelar</button>
-                    <button type="submit" class="btn-save">Guardar Prato</button>
-                </div>
-            </form>
-        </div>
-    </div>
+            <div class="modal-buttons">
+                 <button type="button" onclick="closeModal()">
+                    Cancel
+                </button>
 
-    <!-- JavaScript -->
-    <script src="./menu.js"></script>
+                <button type="submit" class="btn-primary" id="saveBtn">
+                    Save Dish
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<script src="menu.js"></script>
+
 </body>
-
 </html>

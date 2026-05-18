@@ -1,102 +1,237 @@
-const modal = document.getElementById('dishModal');
-const menuForm = document.getElementById('menuForm');
-const menuGrid = document.getElementById('menuGrid');
-let editingCard = null; // Variável para saber se estamos a editar ou a criar novo
+// =============================
+// SUPABASE
+// =============================
+import { SUPABASE_URL, SUPABASE_KEY } from '../.env.js';
 
-// --- FUNÇÃO PARA ABRIR/FECHAR MODAL ---
-function toggleModal() {
-    modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
-    if (modal.style.display === 'none') {
-        menuForm.reset();
-        editingCard = null; // Limpa o estado de edição
-        document.querySelector('.btn-save').textContent = "Guardar Prato";
-    }
+const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+);
+
+// =============================
+// SETTINGS
+// =============================
+
+const restaurantId = 'restaurant123';
+
+let editingDishId = null;
+
+// =============================
+// MODAL
+// =============================
+
+const modal = document.getElementById('dishModal');
+
+function openModal() {
+    modal.classList.add('active');
 }
 
-// --- LOGICA DOS FILTROS ---
-document.querySelectorAll('.filter-btn').forEach(button => {
-    button.addEventListener('click', () => {
-        // Remover classe active de todos e adicionar ao clicado
-        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
-
-        const category = button.textContent;
-        const cards = document.querySelectorAll('.dish-card');
-
-        cards.forEach(card => {
-            if (category === 'All' || card.getAttribute('data-category') === category) {
-                card.style.display = 'flex';
-            } else {
-                card.style.display = 'none';
-            }
-        });
-    });
+function closeModal() {
+    modal.classList.remove('active');
+    resetForm();
+}
+window.addEventListener('click', (e) => {
+    if (e.target === modal) {
+        closeModal();
+    }
 });
 
-// --- SUBMETER FORMULÁRIO (CRIAR OU EDITAR) ---
-menuForm.addEventListener('submit', function (e) {
-    e.preventDefault();
+// =============================
+// LOAD DISHES
+// =============================
 
-    const name = document.getElementById('dishName').value;
-    const desc = document.getElementById('dishDesc').value;
-    const price = document.getElementById('dishPrice').value;
-    const category = document.getElementById('dishCategory').value;
-    const imgFile = document.getElementById('dishImage').files[0];
+async function loadDishes() {
 
-    const processCard = (imgUrl) => {
-        if (editingCard) {
-            // Se estivermos a editar, atualizamos o card existente
-            editingCard.querySelector('h3').textContent = name;
-            editingCard.querySelector('p').textContent = desc;
-            editingCard.querySelector('.dish-price').textContent = `€${parseFloat(price).toFixed(2)}`;
-            editingCard.setAttribute('data-category', category);
-            if (imgUrl) editingCard.querySelector('img').src = imgUrl;
-        } else {
-            // Se for novo, criamos do zero
-            const card = document.createElement('div');
-            card.className = 'dish-card';
-            card.setAttribute('data-category', category);
-            card.innerHTML = `
-                <div class="dish-img-container">
-                    <img src="${imgUrl || 'https://via.placeholder.com/70'}" alt="${name}">
-                </div>
-                <div class="dish-info">
-                    <h3>${name}</h3>
-                    <p>${desc}</p>
-                    <span class="dish-price">€${parseFloat(price).toFixed(2)}</span>
-                </div>
-                <div class="card-actions">
-                    <button class="btn-icon edit-btn"><i class="far fa-edit"></i></button>
-                    <button class="btn-icon delete-btn"><i class="far fa-trash-alt"></i></button>
+    const { data, error } = await supabaseClient
+        .from('menu_items')
+        .select('*')
+        .eq('restaurant_id', restaurantId)
+        .order('created_at', { ascending: true });
+
+    if (error) {
+        console.log(error);
+        return;
+    }
+
+    renderDishes(data);
+}
+
+// =============================
+// RENDER DISHES
+// =============================
+
+function renderDishes(dishes) {
+    const container = document.getElementById('menuContainer');
+
+    if (dishes.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <h2>No dishes yet</h2>
+                <p>Add your first menu item.</p>
+            </div>
+        `;
+
+        return;
+    }
+
+    const categories = ['Starters', 'Mains', 'Desserts', 'Drinks'];
+
+    let html = '';
+
+    categories.forEach(category => {
+
+        const filtered = dishes.filter(dish => dish.category === category);
+
+        if (filtered.length === 0) return;
+
+        html += `
+            <section class="menu-section">
+                <h2>${category}</h2>
+
+                <div class="menu-grid">
+        `;
+
+        filtered.forEach(dish => {
+
+            html += `
+                <div class="dish-card"> <img src="${dish.image_url || 'https://placehold.co/600x400'}">
+
+                    <div class="dish-content">
+
+                        <h3>${dish.name}</h3>
+
+                        <p>${dish.description}</p>
+
+                        <span class="price">€${dish.price}</span>
+
+                        <div class="card-actions">
+
+                            <button
+                                class="edit-btn"
+                                onclick="editDish('${dish.id}')"
+                            >
+                                Edit
+                            </button>
+
+                            <button
+                                class="delete-btn"
+                                onclick="deleteDish('${dish.id}')"
+                            >
+                                Delete
+                            </button>
+
+                        </div>
+
+                    </div>
+
                 </div>
             `;
+        });
+        html += `
+                </div>
+            </section>
+        `;
+    });
 
-            // Adicionar eventos aos novos botões
-            card.querySelector('.delete-btn').addEventListener('click', () => card.remove());
-            card.querySelector('.edit-btn').addEventListener('click', () => openEditModal(card));
+    container.innerHTML = html;
+}
 
-            menuGrid.appendChild(card);
-        }
-        toggleModal();
+// =============================
+// SAVE DISH
+// =============================
+
+const dishForm = document.getElementById('dishForm');
+
+dishForm.addEventListener('submit', async (e) => {
+
+    e.preventDefault();
+
+    const saveBtn = document.getElementById('saveBtn');
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving...';
+
+    const dish = {
+        restaurant_id: restaurantId,
+        name: document.getElementById('dishName').value,
+        description: document.getElementById('dishDescription').value,
+        price: document.getElementById('dishPrice').value,
+        category: document.getElementById('dishCategory').value,
+        image_url: document.getElementById('dishImage').value
     };
 
-    if (imgFile) {
-        const reader = new FileReader();
-        reader.onload = (event) => processCard(event.target.result);
-        reader.readAsDataURL(imgFile);
+    let error;
+
+    if (editingDishId) {
+
+        const response = await supabaseClient
+            .from('menu_items').update(dish)
+            .eq('id', editingDishId);
+
+        error = response.error;
+
     } else {
-        processCard(null);
+
+        const response = await supabaseClient
+            .from('menu_items')
+            .insert([dish]);
+
+        error = response.error;
     }
+
+    if (error) {
+        console.log(error);
+        alert('Error saving dish');
+    } else {
+        closeModal();
+        loadDishes();
+    }
+
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Save Dish';
 });
 
-// --- FUNÇÃO PARA EDITAR ---
-function openEditModal(card) {
-    editingCard = card;
-    document.getElementById('dishName').value = card.querySelector('h3').textContent;
-    document.getElementById('dishDesc').value = card.querySelector('p').textContent;
-    document.getElementById('dishPrice').value = card.querySelector('.dish-price').textContent.replace('€', '');
-    document.getElementById('dishCategory').value = card.getAttribute('data-category');
+// =============================
+// DELETE DISH
+// =============================
 
-    document.querySelector('.btn-save').textContent = "Atualizar Prato";
-    toggleModal();
+async function deleteDish(id) {
+    const confirmed = confirm('Delete this dish?');
+
+    if (!confirmed) return;
+
+    const { error } = await supabaseClient
+        .from('menu_items')
+        .delete()
+        .eq('id', id);
+
+    if (error) {
+        console.log(error);
+        return;
+    }
+
+    loadDishes();
 }
+
+// =============================
+// EDIT DISH
+// =============================
+
+async function editDish(id) {
+
+    const { data, error } = await supabaseClient
+        .from('menu_items')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+    if (error) {
+        console.log(error);
+        return;
+    }
+
+    editingDishId = id;
+    document.getElementById('modalTitle').textContent = 'Edit Dish';
+
+    document.getElementById('dishName').value = data.name;
+    document.getElementById('dishDescription').value = d

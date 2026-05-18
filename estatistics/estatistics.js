@@ -1,15 +1,9 @@
-async function loadStats() {
-    const { data } = await supabase
-        .from('orders')
-        .select('revenue, created_at')
-        .gte('created_at', todayStart);
+import { SUPABASE_URL, SUPABASE_KEY } from '../.env.js';
 
-    dataToday.orders = data.length;
-    dataToday.revenue = data.reduce((sum, r) => sum + r.revenue, 0);
-    calculateStats();
-}
+const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+const todayStart = new Date();
+todayStart.setHours(0, 0, 0, 0);
 
-// Dados simulados (Podes alterar estes números para testar)
 const dataToday = {
     orders: 47,
     revenue: 683,
@@ -22,46 +16,95 @@ const dataYesterday = {
     scans: 110
 };
 
-function calculateStats() {
-    // 1. Cálculo do Ticket Médio (Revenue / Orders)
-    const avgToday = dataToday.revenue / dataToday.orders;
-    const avgYesterday = dataYesterday.revenue / dataYesterday.orders;
+const elementIds = {
+    orders: 'orders-value',
+    revenue: 'revenue-value',
+    avg: 'avg-value',
+    scans: 'scans-value',
+    ordersTrend: 'orders-trend',
+    revenueTrend: 'revenue-trend',
+    avgTrend: 'avg-trend',
+    scansTrend: 'scans-trend'
+};
 
-    // 2. Função para calcular a variação percentual
-    const getTrend = (current, previous) => {
-        const diff = ((current - previous) / previous) * 100;
-        const symbol = diff >= 0 ? "↑" : "↓";
-        const cssClass = diff >= 0 ? "trend-up" : "trend-down";
+async function loadTodayStats() {
+    if (!supabaseClient) {
+        return;
+    }
+
+    const { data, error } = await supabaseClient
+        .from('orders')
+        .select('revenue, created_at')
+        .gte('created_at', todayStart.toISOString());
+
+    if (error) {
+        console.error('Erro ao carregar estatísticas:', error);
+        return;
+    }
+
+    if (!data) {
+        return;
+    }
+
+    dataToday.orders = data.length;
+    dataToday.revenue = data.reduce((sum, order) => sum + (order.revenue || 0), 0);
+}
+
+function getTrend(current, previous) {
+    if (!previous) {
         return {
-            text: `${symbol} ${Math.abs(diff).toFixed(1)}% vs yesterday`,
-            class: cssClass
+            text: 'Sem comparação',
+            className: 'trend-neutral'
         };
+    }
+
+    const diff = ((current - previous) / previous) * 100;
+    const symbol = diff >= 0 ? '↑' : '↓';
+    const className = diff >= 0 ? 'trend-up' : 'trend-down';
+
+    return {
+        text: `${symbol} ${Math.abs(diff).toFixed(1)}% vs yesterday`,
+        className
     };
-
-    // 3. Atualizar o DOM (Interface)
-    updateElement("orders-value", dataToday.orders);
-    updateTrend("orders-trend", getTrend(dataToday.orders, dataYesterday.orders));
-
-    updateElement("revenue-value", `€${dataToday.revenue}`);
-    updateTrend("revenue-trend", getTrend(dataToday.revenue, dataYesterday.revenue));
-
-    updateElement("avg-value", `€${avgToday.toFixed(2)}`);
-    updateTrend("avg-trend", getTrend(avgToday, avgYesterday));
-
-    updateElement("scans-value", dataToday.scans);
-    updateTrend("scans-trend", getTrend(dataToday.scans, dataYesterday.scans));
 }
 
-// Funções auxiliares para limpar o código
 function updateElement(id, value) {
-    document.getElementById(id).textContent = value;
-}
-
-function updateTrend(id, trendObj) {
     const el = document.getElementById(id);
-    el.textContent = trendObj.text;
-    el.className = `stat-trend ${trendObj.class}`;
+    if (el) {
+        el.textContent = value;
+    }
 }
 
-// Executa os cálculos ao carregar a página
-window.onload = calculateStats;
+function updateTrend(id, trend) {
+    const el = document.getElementById(id);
+    if (!el) {
+        return;
+    }
+
+    el.textContent = trend.text;
+    el.className = `stat-trend ${trend.className}`;
+}
+
+function calculateStats() {
+    const avgToday = dataToday.orders ? dataToday.revenue / dataToday.orders : 0;
+    const avgYesterday = dataYesterday.orders ? dataYesterday.revenue / dataYesterday.orders : 0;
+
+    updateElement(elementIds.orders, dataToday.orders);
+    updateTrend(elementIds.ordersTrend, getTrend(dataToday.orders, dataYesterday.orders));
+
+    updateElement(elementIds.revenue, `€${dataToday.revenue}`);
+    updateTrend(elementIds.revenueTrend, getTrend(dataToday.revenue, dataYesterday.revenue));
+
+    updateElement(elementIds.avg, `€${avgToday.toFixed(2)}`);
+    updateTrend(elementIds.avgTrend, getTrend(avgToday, avgYesterday));
+
+    updateElement(elementIds.scans, dataToday.scans);
+    updateTrend(elementIds.scansTrend, getTrend(dataToday.scans, dataYesterday.scans));
+}
+
+async function initStatisticsPage() {
+    await loadTodayStats();
+    calculateStats();
+}
+
+window.addEventListener('DOMContentLoaded', initStatisticsPage);
