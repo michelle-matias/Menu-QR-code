@@ -48,8 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loginBtn.addEventListener('click', (e) => {
         console.log("Botão de login premido");
-        // Aqui poderias redirecionar para a página de login
-        // window.location.href = 'login.html';
+        window.location.href = '../login/login.html';
     });
 
     const ctaButton = document.querySelector('.cta-button');
