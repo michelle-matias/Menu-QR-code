@@ -40,6 +40,8 @@ window.closeModal = function () {
     editingId = null;
 }
 
+
+
 window.previewMenu = function () {
     // Add your preview menu implementation here
 }
