@@ -150,7 +150,12 @@ function renderDishes(dishes) {
     const container = document.getElementById('menuContainer');
 
     if (dishes.length === 0) {
-        container.innerHTML = '<p style="color:#888;padding:2rem;">No dishes yet. Add your first one!</p>';
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-utensils"></i>
+                <p>No dishes yet. Add your first one!</p>
+            </div>
+        `;
         return;
     }
 
