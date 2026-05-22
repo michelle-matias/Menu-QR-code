@@ -43,7 +43,7 @@ window.closeModal = function () {
 
 
 window.previewMenu = function () {
-    // Add your preview menu implementation here
+    window.open('../menu_editor/preview menu.html');
 }
 
 // Close modal when clicking outside modal-content
@@ -224,9 +224,10 @@ async function loadDishes() {
     renderDishes(data);
 }
 
+
 // ─── PREVIEW ──────────────────────────────────────────────────────────────────
 function previewMenu() {
-    window.open('../menu/index.html', '_blank');
+    window.open('../menu_editor/preview menu.html',);
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
