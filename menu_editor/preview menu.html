@@ -30,6 +30,20 @@
             text-decoration: none; opacity: 0.85; transition: opacity 0.2s;
         }
         .top-bar-link:hover { opacity: 1; text-decoration: underline; }
+
+        /* ── NEW: user info + sign-out in top bar ── */
+        .top-bar-right { display: flex; align-items: center; gap: 12px; }
+        .user-email-badge {
+            color: #bdc3c7; font-size: 0.8rem; max-width: 180px;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .btn-signout {
+            background: rgba(231,76,60,0.75); color: white; border: none;
+            padding: 6px 12px; border-radius: 4px; font-size: 0.8rem;
+            font-weight: 600; cursor: pointer; transition: background 0.2s;
+        }
+        .btn-signout:hover { background: #e74c3c; }
+
         .cart-status {
             color: #fff; font-weight: bold; cursor: pointer;
             background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 4px;
@@ -37,6 +51,15 @@
         }
         .cart-status:hover { background: rgba(255,255,255,0.2); }
         .cart-status.has-items { background: #e67e22; }
+
+        /* AUTH GATE — shown while session check runs */
+        #auth-gate {
+            position: fixed; inset: 0; background: #1a252f;
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; z-index: 999; gap: 14px;
+        }
+        #auth-gate p { color: #ecf0f1; font-size: 1.1rem; }
+        #auth-gate small { color: #7f8c8d; font-size: 0.85rem; }
 
         /* ADMIN PANEL */
         .admin-panel {
@@ -94,7 +117,7 @@
             padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold;
         }
 
-        /* CART BAR (bottom, clickable, no button) */
+        /* CART BAR */
         .cart-footer {
             position: fixed; bottom: 0; left: 0; right: 0;
             background: #e67e22; color: white;
@@ -138,12 +161,8 @@
             background: none; border: none; font-size: 1.5rem; cursor: pointer;
             color: #7f8c8d; line-height: 1;
         }
-        .cart-items-list {
-            overflow-y: auto; flex: 1; padding: 12px 24px;
-        }
-        .cart-empty-msg {
-            text-align: center; color: #95a5a6; padding: 40px 0; font-size: 1rem;
-        }
+        .cart-items-list { overflow-y: auto; flex: 1; padding: 12px 24px; }
+        .cart-empty-msg { text-align: center; color: #95a5a6; padding: 40px 0; font-size: 1rem; }
         .cart-row {
             display: flex; align-items: center; justify-content: space-between;
             padding: 12px 0; border-bottom: 1px solid #f5f5f5; gap: 10px;
@@ -151,9 +170,7 @@
         .cart-row-info { flex: 1; }
         .cart-row-name { font-weight: 600; font-size: 0.95rem; color: #2c3e50; }
         .cart-row-price { font-size: 0.875rem; color: #7f8c8d; margin-top: 2px; }
-        .cart-row-qty {
-            display: flex; align-items: center; gap: 8px;
-        }
+        .cart-row-qty { display: flex; align-items: center; gap: 8px; }
         .btn-qty {
             width: 28px; height: 28px; border-radius: 50%; border: 2px solid #e0e0e0;
             background: white; font-size: 1rem; cursor: pointer; font-weight: bold;
@@ -166,7 +183,6 @@
         .qty-number { font-weight: 700; font-size: 1rem; min-width: 20px; text-align: center; color: #2c3e50; }
         .cart-drawer-footer {
             padding: 16px 24px; border-top: 1px solid #eee; background: white;
-            border-radius: 0 0 0 0;
         }
         .cart-subtotal {
             display: flex; justify-content: space-between;
@@ -218,22 +234,34 @@
         @media (max-width: 768px) {
             body { flex-direction: column; }
             .admin-panel { width: 100%; height: auto; padding-top: 20px; }
+            .user-email-badge { display: none; }
         }
     </style>
 </head>
 <body>
 
+<!-- AUTH GATE (shown while session is being verified) -->
+<div id="auth-gate">
+    <p>🔐 A verificar sessão...</p>
+    <small>Se demorar, será redirecionado para o login.</small>
+</div>
+
 <!-- TOP BAR -->
 <div class="top-bar">
     <div class="top-bar-left">
         <button class="btn-toggle-admin" id="btn-toggle-mode">Painel do Dono</button>
-        <a class="top-bar-link" id="top-bar-link" href="#" target="_blank" id="nav-link">📋 Pedidos</a>
+        <a class="top-bar-link" id="top-bar-link" href="#" id="nav-link">📋 Pedidos</a>
     </div>
-    <div class="cart-status" id="cart-status" title="Clique para ver o carrinho">🛒 Vazio</div>
+    <div class="top-bar-right">
+        <!-- Shows the logged-in user's email -->
+        <span class="user-email-badge" id="user-email-badge"></span>
+        <div class="cart-status" id="cart-status" title="Clique para ver o carrinho">🛒 Vazio</div>
+        <button class="btn-signout" id="btn-signout">Sair</button>
+    </div>
 </div>
 
 <!-- ADMIN PANEL -->
-<aside class="admin-panel" id="admin-sidebar">
+<aside class="admin-panel hidden" id="admin-sidebar">
     <h2>Editar Restaurante</h2>
     <div class="control-group">
         <label>Nome do Restaurante:</label>
@@ -277,7 +305,7 @@
     </div>
 </main>
 
-<!-- CART BAR (bottom strip — click to open drawer) -->
+<!-- CART BAR -->
 <div class="cart-footer" id="cart-footer">
     <div class="cart-footer-inner">
         <div class="cart-footer-label">
@@ -288,7 +316,7 @@
     </div>
 </div>
 
-<!-- CART DRAWER OVERLAY -->
+<!-- CART OVERLAY -->
 <div class="cart-overlay" id="cart-overlay"></div>
 
 <!-- CART DRAWER -->
@@ -310,7 +338,7 @@
     </div>
 </div>
 
-<!-- ORDERS PAGE (overlay) -->
+<!-- ORDERS PAGE -->
 <div class="orders-page" id="orders-page">
     <div class="orders-header">
         <h2>📋 Pedidos Recebidos</h2>
@@ -329,16 +357,20 @@
     // ============================================================
     // ⚠️  SUBSTITUA PELAS SUAS CREDENCIAIS DO SUPABASE
     // ============================================================
-    const SUPABASE_URL  = 'https://zxlylpetxrugjaqlnini.supabase.co';  // <-- altere aqui
+    const SUPABASE_URL      = 'https://zxlylpetxrugjaqlnini.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_V8rOwnV2gXwPEMZ856HK0g_bApJ_gEA';
     // ============================================================
 
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    // ── Active user (set after session check) ──────────────────
+    let currentUser = null;
+
     // carrinho: [{ nome, preco, qty }]
     let carrinho = [];
 
     // DOM refs
+    const authGate          = document.getElementById('auth-gate');
     const adminSidebar      = document.getElementById('admin-sidebar');
     const menuContainer     = document.getElementById('menu-container');
     const txtRestaurantName = document.getElementById('text-restaurant-name');
@@ -354,13 +386,43 @@
     const cartFooter        = document.getElementById('cart-footer');
     const cartOverlay       = document.getElementById('cart-overlay');
     const cartDrawer        = document.getElementById('cart-drawer');
+    const userEmailBadge    = document.getElementById('user-email-badge');
 
-    // Toggle admin
+    // ── Session guard ───────────────────────────────────────────
+    // Runs immediately. Redirects to login if no active session.
+    async function verificarSessao() {
+        try {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) {
+                // No active session → redirect to login page
+                window.location.href = '/login.html'; // <-- adjust to your login URL
+                return;
+            }
+            currentUser = session.user;
+            // Show user email in top bar
+            userEmailBadge.textContent = currentUser.email || currentUser.id;
+        } catch (err) {
+            console.error('Erro ao verificar sessão:', err);
+            window.location.href = '/login.html';
+            return;
+        }
+
+        // Hide auth gate, reveal page, start the app
+        authGate.style.display = 'none';
+        await inicializarSistema();
+    }
+
+    // Sign-out
+    document.getElementById('btn-signout').addEventListener('click', () => {
+        window.location.href = '/login.html'; // <-- adjust to your redirect URL
+    });
+
+    // ── Toggle admin ─────────────────────────────────────────────
     document.getElementById('btn-toggle-mode').addEventListener('click', () => {
         adminSidebar.classList.toggle('hidden');
     });
 
-    // Open/close cart drawer
+    // ── Cart drawer ──────────────────────────────────────────────
     function abrirCarrinho() {
         renderCarrinhoDrawer();
         cartOverlay.classList.add('visible');
@@ -377,7 +439,6 @@
     cartOverlay.addEventListener('click', fecharCarrinho);
     document.getElementById('btn-close-cart').addEventListener('click', fecharCarrinho);
 
-    // Render cart drawer contents
     function renderCarrinhoDrawer() {
         const list   = document.getElementById('cart-items-list');
         const symbol = inputCurrency.value || '€';
@@ -407,7 +468,6 @@
         document.getElementById('btn-submit-order').disabled = false;
     }
 
-    // Change quantity (or remove if hits 0)
     function alterarQty(idx, delta) {
         carrinho[idx].qty += delta;
         if (carrinho[idx].qty <= 0) carrinho.splice(idx, 1);
@@ -415,7 +475,6 @@
         renderCarrinhoDrawer();
     }
 
-    // Update bottom bar
     function atualizarBarraCarrinho() {
         const symbol     = inputCurrency.value || '€';
         const totalItems = carrinho.reduce((s, i) => s + i.qty, 0);
@@ -434,7 +493,6 @@
         }
     }
 
-    // Add to cart (groups same item)
     function adicionarAoCarrinho(nome, preco) {
         const existing = carrinho.find(i => i.nome === nome);
         if (existing) existing.qty += 1;
@@ -442,18 +500,17 @@
         atualizarBarraCarrinho();
     }
 
-    // Submit order
+    // ── Submit order — scoped to currentUser.id ──────────────────
     document.getElementById('btn-submit-order').addEventListener('click', async () => {
-        if (carrinho.length === 0) return;
+        if (carrinho.length === 0 || !currentUser) return;
         const symbol = inputCurrency.value || '€';
         const total  = carrinho.reduce((s, i) => s + i.preco * i.qty, 0);
-
-        // Flatten to individual items for storage
         const itensFlatten = carrinho.flatMap(i => Array(i.qty).fill({ nome: i.nome, preco: i.preco }));
 
         const { error } = await supabaseClient.from('pedidos').insert({
-            itens:  JSON.stringify(itensFlatten),
-            total:  total
+            user_id: currentUser.id,   // ← scoped to this user
+            itens:   JSON.stringify(itensFlatten),
+            total:   total
         });
 
         if (!error) {
@@ -466,7 +523,7 @@
         }
     });
 
-    // Visual styles
+    // ── Visual styles ─────────────────────────────────────────────
     function applyVisualStyles(config) {
         if (!config) return;
         txtRestaurantName.innerText         = config.nome_restaurante || 'Menu';
@@ -480,17 +537,15 @@
             else if (config.layout_style === 'rustic')  el.style.borderRadius = '16px';
             else                                        el.style.borderRadius = '8px';
         });
-        if (config.nav_label) { topBarLink.innerText = config.nav_label; inputNavLabel.value = config.nav_label; }
-        if (config.nav_url)   { topBarLink.href      = config.nav_url;   inputNavUrl.value   = config.nav_url; }
     }
 
     function realTimePreview() {
         applyVisualStyles({
             nome_restaurante: inputName.value,
-            layout_style: inputStyle.value,
-            bg_color: inputBgColor.value,
-            primary_color: inputPrimaryColor.value,
-            accent_color: inputAccentColor.value
+            layout_style:     inputStyle.value,
+            bg_color:         inputBgColor.value,
+            primary_color:    inputPrimaryColor.value,
+            accent_color:     inputAccentColor.value
         });
         const symbol = inputCurrency.value || '€';
         document.querySelectorAll('.item-price').forEach(el => {
@@ -502,26 +557,22 @@
     [inputName, inputCurrency, inputStyle, inputBgColor, inputPrimaryColor, inputAccentColor]
         .forEach(el => el.addEventListener('input', realTimePreview));
 
-    // Init
+    // ── Init — queries scoped to currentUser.id ───────────────────
     async function inicializarSistema() {
         menuWrapper.innerHTML = '';
-        if (SUPABASE_URL.includes('SEU_PROJECT_ID') || SUPABASE_ANON_KEY.includes('SUA_ANON_KEY')) {
-            menuWrapper.innerHTML = `
-                <div class="debug-box">
-                    <h3>⚠️ Credenciais não configuradas</h3>
-                    <p>Substitua <code>SUPABASE_URL</code> e <code>SUPABASE_ANON_KEY</code> no ficheiro.</p>
-                    <p>Encontra-os em: <strong>Supabase → Project Settings → API</strong></p>
-                </div>`;
-            return;
-        }
         try {
-            const { data: items, error } = await supabaseClient.from('dishes').select('*');
+            // Fetch only dishes belonging to this user
+            const { data: items, error } = await supabaseClient
+                .from('dishes')
+                .select('*')
+                .eq('user_id', currentUser.id);   // ← scoped
+
             if (error) {
                 menuWrapper.innerHTML = `<div class="debug-box"><h3>⚠️ Erro na tabela 'dishes':</h3><p>${error.message}</p></div>`;
                 return;
             }
             if (!items || items.length === 0) {
-                menuWrapper.innerHTML = `<div class="debug-box success"><h3>🎉 Ligado!</h3><p>Tabela <strong>dishes</strong> vazia. Adicione pratos no Supabase.</p></div>`;
+                menuWrapper.innerHTML = `<div class="debug-box success"><h3>🎉 Ligado!</h3><p>Sem pratos para este utilizador. Adicione pratos no Supabase com <code>user_id = '${currentUser.id}'</code>.</p></div>`;
                 await loadRestauranteConfig();
                 return;
             }
@@ -573,29 +624,35 @@
         loadRestauranteConfig();
     }
 
-    // Save config
+    // ── Save config — scoped to currentUser.id ───────────────────
     btnSave.addEventListener('click', async () => {
+        if (!currentUser) return;
         btnSave.innerText = 'A guardar...';
         const { error } = await supabaseClient.from('restaurante_config').upsert({
-            id: 1,
+            user_id:          currentUser.id,      // ← scoped (use as PK or unique key)
             nome_restaurante: inputName.value,
-            layout_style: inputStyle.value,
-            bg_color: inputBgColor.value,
-            primary_color: inputPrimaryColor.value,
-            accent_color: inputAccentColor.value,
-            currency: inputCurrency.value || '€',
-            nav_label: inputNavLabel.value || '',
-            nav_url:   inputNavUrl.value   || '#'
-        });
+            layout_style:     inputStyle.value,
+            bg_color:         inputBgColor.value,
+            primary_color:    inputPrimaryColor.value,
+            accent_color:     inputAccentColor.value,
+            currency:         inputCurrency.value || '€'
+        }, { onConflict: 'user_id' });             // ← upsert on user_id
+
         btnSave.innerText = 'Guardar Alterações';
         if (!error) alert('Guardado com sucesso!');
         else        alert('Erro: ' + error.message);
     });
 
-    // Load config
+    // ── Load config — scoped to currentUser.id ───────────────────
     async function loadRestauranteConfig() {
+        if (!currentUser) return;
         try {
-            const { data } = await supabaseClient.from('restaurante_config').select('*').eq('id', 1).maybeSingle();
+            const { data } = await supabaseClient
+                .from('restaurante_config')
+                .select('*')
+                .eq('user_id', currentUser.id)   // ← scoped
+                .maybeSingle();
+
             if (data) {
                 inputName.value         = data.nome_restaurante || '';
                 inputCurrency.value     = data.currency         || '€';
@@ -608,21 +665,38 @@
         } catch (e) { console.warn('Config não carregada:', e.message); }
     }
 
-    // Orders page
+    // ── Orders page ──────────────────────────────────────────────
+    topBarLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('orders-page').classList.add('visible');
+        carregarPedidos();
+    });
+
     document.getElementById('btn-close-orders').addEventListener('click', () => {
         document.getElementById('orders-page').classList.remove('visible');
     });
+
     document.getElementById('btn-clear-orders').addEventListener('click', async () => {
+        if (!currentUser) return;
         if (!confirm('Apagar todos os pedidos?')) return;
-        await supabaseClient.from('pedidos').delete().neq('id', 0);
+        // Delete only THIS user's orders
+        await supabaseClient.from('pedidos').delete()
+            .eq('user_id', currentUser.id);   // ← scoped
         carregarPedidos();
     });
 
     async function carregarPedidos() {
+        if (!currentUser) return;
         const list = document.getElementById('orders-list');
         list.innerHTML = '<div class="orders-empty">A carregar...</div>';
         try {
-            const { data: pedidos, error } = await supabaseClient.from('pedidos').select('*').order('id', { ascending: false });
+            // Fetch only THIS user's orders
+            const { data: pedidos, error } = await supabaseClient
+                .from('pedidos')
+                .select('*')
+                .eq('user_id', currentUser.id)   // ← scoped
+                .order('id', { ascending: false });
+
             if (error) { list.innerHTML = `<div class="debug-box"><h3>Erro</h3><p>${error.message}</p></div>`; return; }
             if (!pedidos || pedidos.length === 0) { list.innerHTML = '<div class="orders-empty">Nenhum pedido ainda.</div>'; return; }
             list.innerHTML = '';
@@ -648,7 +722,20 @@
         } catch(e) { list.innerHTML = `<div class="debug-box"><h3>Erro</h3><p>${e.message}</p></div>`; }
     }
 
-    document.addEventListener('DOMContentLoaded', inicializarSistema);
+    // ── Bootstrap ────────────────────────────────────────────────
+    // Listen for auth state changes (handles token refresh, sign-out from another tab, etc.)
+    // Only redirect on an explicit sign-out — NOT on the initial SIGNED_IN event
+    // that fires on every page load, which would cause an infinite redirect loop.
+    supabaseClient.auth.onAuthStateChange((event) => {
+        if (event === 'SIGNED_OUT') {
+            window.location.href = '/login.html'; // <-- adjust to your login URL
+        }
+    });
+
+    // The script is at the bottom of <body> so the DOM is already parsed.
+    // Using DOMContentLoaded here means the event has already fired and the
+    // callback would never run — keeping the auth gate stuck forever.
+    verificarSessao();
 </script>
 </body>
 </html>

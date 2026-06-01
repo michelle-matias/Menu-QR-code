@@ -1,5 +1,4 @@
-export const SUPABASE_URL = 'https://zxlylpetxrugjaqlnini.supabase.co';
-export const SUPABASE_KEY = 'sb_publishable_V8rOwnV2gXwPEMZ856HK0g_bApJ_gEA';
+import { SUPABASE_URL, SUPABASE_KEY } from '../.env.js';
 
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -104,12 +103,15 @@ document.getElementById('dishForm').addEventListener('submit', async (e) => {
         image_url = preview.src || null;
     }
 
+    const { data: { user } } = await db.auth.getUser(); // 👈 get current user
+
     const payload = {
         name: document.getElementById('dishName').value.trim(),
         description: document.getElementById('dishDescription').value.trim(),
         price: parseFloat(document.getElementById('dishPrice').value),
         category: document.getElementById('dishCategory').value,
         image_url,
+        user_id: user.id,
     };
 
     let error;
@@ -210,9 +212,12 @@ async function loadDishes() {
     const container = document.getElementById('menuContainer');
     container.innerHTML = '<p style="color:#888;padding:2rem;">Loading...</p>';
 
+    const { data: { user } } = await db.auth.getUser(); // 👈 get current user
+
     const { data, error } = await db
         .from('dishes')
         .select('*')
+        .eq('user_id', user.id)                        // 👈 filter by user
         .order('created_at', { ascending: true });
 
     if (error) {
